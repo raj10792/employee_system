@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_26_134948) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_150834) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,6 +50,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_134948) do
     t.index ["department_id"], name: "index_employees_on_department_id"
     t.index ["email"], name: "index_employees_on_email", unique: true
     t.index ["employee_code"], name: "index_employees_on_employee_code", unique: true
+    t.index ["employment_status", "country_id"], name: "index_employees_on_employment_status_and_country_id"
+    t.index ["employment_status"], name: "index_employees_on_employment_status"
   end
 
   create_table "revoked_tokens", force: :cascade do |t|
