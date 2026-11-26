@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       delete "logout", to: "sessions#destroy"
       resources :employees
       get "salaries", to: "salaries#index"
+      get "lookups", to: "lookups#index"
     end
   end
 end
