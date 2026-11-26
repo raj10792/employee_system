@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :department do
-    name { "MyString" }
-    description { "MyText" }
+    name { "Engineering" }
+    description { "Engineering Department" }
   end
 end
