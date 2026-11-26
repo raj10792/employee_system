@@ -35,13 +35,24 @@ the frontend proxies API requests through the Compose network. On startup,
 Rails runs `db:prepare`. The development database is stored in the
 `postgres_data` volume.
 
-The current backend seed file does not create countries, departments, or users.
-For a local demo, create starter records after the services are healthy:
+After the services are healthy, seed the local HR manager and admin accounts:
 
 ```sh
-docker compose exec api bin/rails runner 'Country.find_or_create_by!(name: "United States") { |c| c.iso_code = "US"; c.currency_code = "USD" }; Department.find_or_create_by!(name: "Engineering"); User.find_or_create_by!(email: "hr@example.com") { |u| u.password = "change-me"; u.role = "hr_manager" }'
+docker compose exec api bin/rails db:seed
 ```
 
-Sign in with `hr@example.com` and `change-me`. This account and the Compose
-database password are for local development only; change them for any shared
-or production deployment. To stop the services, run `docker compose down`.
+By default, the local accounts are `hr@example.com` and `admin@example.com`,
+both with password `change-me`. Set `HR_MANAGER_SEED_EMAIL`,
+`HR_MANAGER_SEED_PASSWORD`, `ADMIN_SEED_EMAIL`, and `ADMIN_SEED_PASSWORD` to
+override them. Production seeding requires explicit password variables.
+
+The seed file does not create countries or departments. Add starter lookup
+records for a local demo with:
+
+```sh
+docker compose exec api bin/rails runner 'Country.find_or_create_by!(name: "United States") { |c| c.iso_code = "US"; c.currency_code = "USD" }; Department.find_or_create_by!(name: "Engineering")'
+```
+
+The default account passwords and Compose database password are for local
+development only; change them for any shared or production deployment. To stop
+the services, run `docker compose down`.
