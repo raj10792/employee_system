@@ -5,15 +5,21 @@ module Api
       before_action :set_employee, only: [:show, :update, :destroy]
 
       def index
-        employees = Employee.includes(:country, :department).order(created_at: :desc)
+        result = paginated_employees
 
         render json: {
-          data: employees.as_json(
+          data: result[:employees].as_json(
             include: {
               country: { only: [:id, :name, :iso_code] },
               department: { only: [:id, :name] }
             }
-          )
+          ),
+          meta: {
+            total_count: result[:total_count],
+            current_page: result[:page],
+            per_page: result[:per_page],
+            total_pages: result[:total_pages]
+          }
         }, status: :ok
       end
 
@@ -81,6 +87,28 @@ module Api
             department: { only: [:id, :name] }
           }
         )
+      end
+
+      def paginated_employees
+        relation = Employees::SearchService.new(params).call
+
+        limit = params.fetch(:per_page, 20).to_i
+        limit = [[limit, 1].max, 100].min
+
+        page = params.fetch(:page, 1).to_i
+        page = [page, 1].max
+
+        total_count = relation.count
+
+        employees = relation.includes(:country, :department).limit(limit).offset((page - 1) * limit)
+
+        {
+          employees: employees,
+          total_count: total_count,
+          page: page,
+          per_page: limit,
+          total_pages: (total_count.to_f / limit).ceil
+        }
       end
 
     end
