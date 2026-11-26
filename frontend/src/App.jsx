@@ -203,6 +203,7 @@ function Dashboard({ token }) {
     .filter((row) => row.country === selectedCountry)
     .sort((left, right) => Number(right.employee_count) - Number(left.employee_count));
   const summary = data?.summary || {};
+  const snapshotDay = new Date().toLocaleDateString("en", { weekday: "long" }).toUpperCase();
 
   useEffect(() => {
     if (country && !countries.includes(country)) setCountry("");
@@ -214,7 +215,7 @@ function Dashboard({ token }) {
   return (
     <>
       <div className="page-heading heading-with-action">
-        <div><p className="eyebrow">THURSDAY, YOUR PEOPLE SNAPSHOT</p><h1>Good morning<span className="heading-period">.</span></h1><p className="page-subtitle">Here’s a clear view of your team and compensation.</p></div>
+        <div><p className="eyebrow">{snapshotDay}, YOUR PEOPLE SNAPSHOT</p><h1>Good morning<span className="heading-period">.</span></h1><p className="page-subtitle">Here’s a clear view of your team and compensation.</p></div>
         <button className="button button-quiet" onClick={() => window.location.reload()}><span className="refresh-icon">↻</span> Refresh data</button>
       </div>
       <section className="metric-grid" aria-label="Employee summary">
