@@ -16,6 +16,6 @@ class EmployeePolicy < ApplicationPolicy
   end
 
   def destroy?
-    user.admin?
+    index?
   end
 end

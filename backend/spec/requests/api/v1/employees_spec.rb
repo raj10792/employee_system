@@ -311,6 +311,28 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
       expect(response).to have_http_status(:no_content)
     end
+
+    it "allows an HR manager to delete an employee" do
+      hr_manager = create(:user, role: :hr_manager)
+      headers = { "Authorization" => "Bearer #{Auth::TokenService.encode(hr_manager)}" }
+
+      expect {
+        delete "/api/v1/employees/#{employee.id}", headers: headers
+      }.to change(Employee, :count).by(-1)
+
+      expect(response).to have_http_status(:no_content)
+    end
+
+    it "does not allow employees to delete an employee" do
+      employee_user = create(:user, role: :employee)
+      headers = { "Authorization" => "Bearer #{Auth::TokenService.encode(employee_user)}" }
+
+      expect {
+        delete "/api/v1/employees/#{employee.id}", headers: headers
+      }.not_to change(Employee, :count)
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   it "rejects unauthenticated requests" do

@@ -20,4 +20,4 @@ to allow the frontend origin. `npm test` runs the focused frontend tests and
 Sign in with an account created in the Rails application. Employee creation
 and editing use the authenticated `/api/v1/lookups` endpoint to load the
 available countries and departments. Deletion remains restricted to users
-with the backend's admin role.
+with the HR manager or admin role.

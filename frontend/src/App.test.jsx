@@ -9,8 +9,8 @@ function jsonResponse(body, status = 200) {
   });
 }
 
-function loginAndSalaryResponses(fetchMock) {
-  fetchMock.mockImplementation(async (url) => {
+function loginAndSalaryResponses(fetchMock, employees = []) {
+  fetchMock.mockImplementation(async (url, options = {}) => {
     const path = new URL(url, "http://localhost").pathname;
     if (path.endsWith("/login")) {
       return jsonResponse({ token: "test-token", user: { email: "hr@example.com", role: "hr_manager" } });
@@ -21,7 +21,8 @@ function loginAndSalaryResponses(fetchMock) {
     if (path.endsWith("/lookups")) {
       return jsonResponse({ data: { countries: [{ id: 7, name: "India", currency_code: "INR" }], departments: [{ id: 3, name: "Engineering" }] } });
     }
-    if (path.endsWith("/employees")) return jsonResponse({ data: [], meta: { total_count: 0, current_page: 1, per_page: 20, total_pages: 0 } });
+    if (path.includes("/employees/") && options.method === "DELETE") return new Response(null, { status: 204 });
+    if (path.endsWith("/employees")) return jsonResponse({ data: employees, meta: { total_count: employees.length, current_page: 1, per_page: 20, total_pages: employees.length ? 1 : 0 } });
     throw new Error(`Unexpected API request: ${path}`);
   });
 }
@@ -34,7 +35,10 @@ async function signIn() {
 }
 
 describe("People & Pay app", () => {
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
   beforeEach(() => {
     localStorage.clear();
@@ -95,6 +99,37 @@ describe("People & Pay app", () => {
           salary: 120000,
         },
       });
+    });
+  });
+
+  it("lets an HR manager delete an employee from the list", async () => {
+    const employee = {
+      id: 8,
+      full_name: "Ada Lovelace",
+      first_name: "Ada",
+      last_name: "Lovelace",
+      employee_code: "EMP008",
+      email: "ada@example.com",
+      job_title: "Engineer",
+      country: { name: "India" },
+      salary: "120000",
+      currency: "INR",
+      employment_status: 0,
+    };
+    loginAndSalaryResponses(global.fetch, [employee]);
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<App />);
+    await signIn();
+
+    fireEvent.click(screen.getByRole("button", { name: /employees/i }));
+    await screen.findByText("Ada Lovelace");
+    fireEvent.click(screen.getByRole("button", { name: "Delete Ada Lovelace" }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/v1/employees/8",
+        expect.objectContaining({ method: "DELETE" }),
+      );
     });
   });
 });

@@ -98,7 +98,7 @@ function App() {
           ) : (
             <Employees
               token={session.token}
-              isAdmin={session.user?.role === "admin"}
+              canDelete={["admin", "hr_manager"].includes(session.user?.role)}
               onNotice={setNotice}
               onUnauthorized={signOut}
             />
@@ -277,7 +277,7 @@ function SalaryValue({ label, amount, currency, emphasized }) {
   return <div className={emphasized ? "salary-value emphasized" : "salary-value"}><span>{label}</span><strong>{formatMoney(amount, currency)}</strong></div>;
 }
 
-function Employees({ token, isAdmin, onNotice, onUnauthorized }) {
+function Employees({ token, canDelete, onNotice, onUnauthorized }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
@@ -375,7 +375,7 @@ function Employees({ token, isAdmin, onNotice, onUnauthorized }) {
                 <td>{employee.country?.name || "—"}</td>
                 <td className="salary-cell">{formatMoney(employee.salary, employee.currency)}</td>
                 <td><span className={`status-pill ${statusName(employee.employment_status)}`}><i />{statusName(employee.employment_status)}</span></td>
-                <td><div className="row-actions"><button title={`Edit ${employee.full_name}`} aria-label={`Edit ${employee.full_name}`} onClick={() => setModalEmployee(employee)}>✎</button>{isAdmin && <button className="danger-action" title={`Delete ${employee.full_name}`} aria-label={`Delete ${employee.full_name}`} disabled={deleting === employee.id} onClick={() => deleteEmployee(employee)}>⌫</button>}</div></td>
+                <td><div className="row-actions"><button title={`Edit ${employee.full_name}`} aria-label={`Edit ${employee.full_name}`} onClick={() => setModalEmployee(employee)}>✎</button>{canDelete && <button className="danger-action" title={`Delete ${employee.full_name}`} aria-label={`Delete ${employee.full_name}`} disabled={deleting === employee.id} onClick={() => deleteEmployee(employee)}>⌫</button>}</div></td>
               </tr>
             )) : <tr><td colSpan="7"><EmptyState title={querySearch || status ? "No matching employees" : "Your team starts here"} text={querySearch || status ? "Try changing the search or status filter." : "Add your first employee to start managing your team."} /></td></tr>}</tbody>
           </table>
