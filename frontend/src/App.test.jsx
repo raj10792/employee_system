@@ -42,6 +42,7 @@ describe("People & Pay app", () => {
 
   beforeEach(() => {
     localStorage.clear();
+    window.history.replaceState({}, "", "/");
     global.fetch = vi.fn();
   });
 
@@ -63,7 +64,7 @@ describe("People & Pay app", () => {
     render(<App />);
     await signIn();
 
-    fireEvent.click(screen.getByRole("button", { name: /employees/i }));
+    fireEvent.click(screen.getByRole("link", { name: /employees/i }));
     await screen.findByText("All employees");
     fireEvent.click(screen.getByRole("button", { name: /add employee/i }));
 
@@ -121,7 +122,7 @@ describe("People & Pay app", () => {
     render(<App />);
     await signIn();
 
-    fireEvent.click(screen.getByRole("button", { name: /employees/i }));
+    fireEvent.click(screen.getByRole("link", { name: /employees/i }));
     await screen.findByText("Ada Lovelace");
     fireEvent.click(screen.getByRole("button", { name: "Delete Ada Lovelace" }));
 
