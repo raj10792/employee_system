@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :department do
-    name { "Engineering" }
-    description { "Engineering Department" }
+    name { Faker::Commerce.unique.department }
+    description { Faker::Lorem.sentence }
   end
 end
