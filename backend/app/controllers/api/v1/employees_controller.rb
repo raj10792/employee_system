@@ -1,10 +1,11 @@
 module Api
   module V1
-    class EmployeesController < ApplicationController
+    class EmployeesController < Api::V1::BaseController
 
       before_action :set_employee, only: [:show, :update, :destroy]
 
       def index
+        authorize Employee
         result = paginated_employees
 
         render json: {
@@ -24,10 +25,12 @@ module Api
       end
 
       def show
+        authorize @employee
         render json: employee_response(@employee), status: :ok
       end
 
       def create
+        authorize Employee
         employee = Employees::CreateService.new(employee_params).call
 
         if employee.persisted?
@@ -40,6 +43,7 @@ module Api
       end
 
       def update
+        authorize @employee
         employee = Employees::UpdateService.new(@employee, employee_params).call
 
         if employee.errors.empty?
@@ -53,6 +57,7 @@ module Api
       end
 
       def destroy
+        authorize @employee
         Employees::DestroyService.new(@employee).call
 
         head :no_content

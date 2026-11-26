@@ -3,6 +3,11 @@ require 'rails_helper'
 RSpec.describe "Api::V1::Employees", type: :request do
   let(:country) { create(:country) }
   let(:department) { create(:department) }
+  let(:auth_headers) do
+    {
+      "Authorization" => "Bearer #{Auth::TokenService.encode(create(:user, role: :admin))}"
+    }
+  end
 
   let(:valid_attributes) do
     {
@@ -71,7 +76,7 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     it "returns all employees" do
 
-      get "/api/v1/employees"
+      get "/api/v1/employees", headers: auth_headers
 
       expect(response).to have_http_status(:ok)
 
@@ -82,7 +87,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     it "returns paginated employees" do
       get "/api/v1/employees",
-          params: { page: 1, per_page: 2 }
+          params: { page: 1, per_page: 2 },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -92,7 +98,7 @@ RSpec.describe "Api::V1::Employees", type: :request do
     end
 
     it "uses the first page when page is invalid" do
-      get "/api/v1/employees", params: { page: -5 }
+      get "/api/v1/employees", params: { page: -5 }, headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -101,7 +107,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     it "searches employees by name" do
       get "/api/v1/employees",
-          params: { search: "Raj" }
+          params: { search: "Raj" },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -111,7 +118,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     it "searches employees by email" do
       get "/api/v1/employees",
-          params: { search: "john@example.com" }
+          params: { search: "john@example.com" },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -120,7 +128,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     it "searches employees by employee code" do
       get "/api/v1/employees",
-          params: { search: "EMP003" }
+          params: { search: "EMP003" },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -129,7 +138,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     it "filters employees by country" do
       get "/api/v1/employees",
-          params: { country_id: india.id }
+          params: { country_id: india.id },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -138,7 +148,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     it "filters employees by department" do
       get "/api/v1/employees",
-          params: { department_id: engineering.id }
+          params: { department_id: engineering.id },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -147,7 +158,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     it "filters employees by job title" do
       get "/api/v1/employees",
-          params: { job_title: "Developer" }
+          params: { job_title: "Developer" },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -159,7 +171,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
           params: {
             country_id: india.id,
             department_id: engineering.id
-          }
+          },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -172,7 +185,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
           params: {
             sort_by: "salary",
             direction: "desc"
-          }
+          },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -185,7 +199,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
       get "/api/v1/employees",
           params: {
             sort_by: "invalid_column"
-          }
+          },
+          headers: auth_headers
 
       expect(response).to have_http_status(:ok)
     end
@@ -194,7 +209,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
       get "/api/v1/employees",
           params: {
             per_page: 500
-          }
+          },
+          headers: auth_headers
 
       json = JSON.parse(response.body)
 
@@ -208,7 +224,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
     create(:employee, employment_status: :inactive)
 
     get "/api/v1/employees",
-        params: { employment_status: "inactive" }
+        params: { employment_status: "inactive" },
+        headers: auth_headers
 
     json = JSON.parse(response.body)
 
@@ -219,7 +236,7 @@ RSpec.describe "Api::V1::Employees", type: :request do
     it "returns employee details" do
       employee = create(:employee)
 
-      get "/api/v1/employees/#{employee.id}"
+      get "/api/v1/employees/#{employee.id}", headers: auth_headers
 
       expect(response).to have_http_status(:ok)
 
@@ -230,7 +247,7 @@ RSpec.describe "Api::V1::Employees", type: :request do
     end
 
     it "returns 404 for an unknown employee" do
-      get "/api/v1/employees/999999"
+      get "/api/v1/employees/999999", headers: auth_headers
 
       expect(response).to have_http_status(:not_found)
     end
@@ -240,7 +257,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
     it "creates an employee" do
       expect {
         post "/api/v1/employees",
-             params: { employee: valid_attributes }
+             params: { employee: valid_attributes },
+             headers: auth_headers
       }.to change(Employee, :count).by(1)
 
       expect(response).to have_http_status(:created)
@@ -256,7 +274,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
       expect {
         post "/api/v1/employees",
-             params: { employee: invalid_attributes }
+             params: { employee: invalid_attributes },
+             headers: auth_headers
       }.not_to change(Employee, :count)
 
       expect(response).to have_http_status(:unprocessable_entity)
@@ -272,7 +291,8 @@ RSpec.describe "Api::V1::Employees", type: :request do
               employee: {
                 job_title: "Senior Software Engineer"
               }
-            }
+            },
+            headers: auth_headers
 
       expect(response).to have_http_status(:ok)
 
@@ -286,10 +306,16 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
     it "deletes an employee" do
       expect {
-        delete "/api/v1/employees/#{employee.id}"
+        delete "/api/v1/employees/#{employee.id}", headers: auth_headers
       }.to change(Employee, :count).by(-1)
 
       expect(response).to have_http_status(:no_content)
     end
+  end
+
+  it "rejects unauthenticated requests" do
+    get "/api/v1/employees"
+
+    expect(response).to have_http_status(:unauthorized)
   end
 end
