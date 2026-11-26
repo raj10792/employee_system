@@ -62,7 +62,7 @@ export default function DashboardPage() {
         </button>
       </div>
       <section className="metric-grid" aria-label="Employee summary">
-        <SummaryCard label="Total employees" value={summary.ttotal_employees ?? summary.total_employees ?? 0} icon="♙" accent="violet" />
+        <SummaryCard label="Total employees" value={summary.total_employees ?? 0} icon="♙" accent="violet" />
         <SummaryCard label="Active employees" value={summary.active_employees ?? 0} icon="↗" accent="green" foot="Currently on the team" />
         <SummaryCard label="Inactive" value={summary.inactive_employees ?? 0} icon="◷" accent="amber" foot="Not currently active" />
         <SummaryCard label="Terminated" value={summary.terminated_employees ?? 0} icon="↘" accent="rose" foot="Former employees" />

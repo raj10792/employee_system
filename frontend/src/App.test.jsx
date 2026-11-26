@@ -16,7 +16,7 @@ function loginAndSalaryResponses(fetchMock, employees = []) {
       return jsonResponse({ token: "test-token", user: { email: "hr@example.com", role: "hr_manager" } });
     }
     if (path.endsWith("/salaries")) {
-      return jsonResponse({ data: { summary: { ttotal_employees: 12, active_employees: 10, inactive_employees: 1, terminated_employees: 1 }, salary_by_country: [], salary_by_job_title: [] } });
+      return jsonResponse({ data: { summary: { total_employees: 12, active_employees: 10, inactive_employees: 1, terminated_employees: 1 }, salary_by_country: [], salary_by_job_title: [] } });
     }
     if (path.endsWith("/lookups")) {
       return jsonResponse({ data: { countries: [{ id: 7, name: "India", currency_code: "INR" }], departments: [{ id: 3, name: "Engineering" }] } });

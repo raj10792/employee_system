@@ -12,7 +12,7 @@ module Salary
 
     def employee_summary
       {
-        ttotal_employees: Employee.count,
+        total_employees: Employee.count,
         active_employees: Employee.active.count,
         inactive_employees: Employee.inactive.count,
         terminated_employees: Employee.terminated.count
