@@ -18,9 +18,10 @@ RSpec.describe User, type: :model do
   end
 
   describe "roles" do
-    it "supports HR manager and admin roles" do
+    it "supports HR manager, admin, and employee roles" do
       expect(build(:user, role: :hr_manager)).to be_hr_manager
       expect(build(:user, role: :admin)).to be_admin
+      expect(build(:user, role: :employee)).to be_employee
     end
   end
 end

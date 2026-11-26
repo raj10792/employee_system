@@ -1,10 +1,10 @@
 class User < ApplicationRecord
-
   has_secure_password
 
   enum :role, {
     hr_manager: 0,
-    admin: 1
+    admin: 1,
+    employee: 2
   }
 
   before_validation :normalize_email
